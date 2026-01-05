@@ -1,8 +1,8 @@
 # TEMPLATE.GITIGNORE
 
 # .NET
-backend/bin/
-backend/obj/
+bin/
+obj/
 *.user
 *.userosscache
 *.suo
