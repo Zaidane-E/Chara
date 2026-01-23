@@ -14,20 +14,23 @@ Currently supports user tasks, task priorities, due dates, and completion tracki
   - Priority (Low, Medium, High)
   - Due date
   - Completion status
-- Filter tasks by status and priority
-- Angular frontend
-- Swagger UI for API 
-- Unit tests for backend endpoints
+  - Timestamps
+- Habit tracking
+  - Add daily habits
+  - Track completion rate
+  - Track completion streak
+- Task filtering
+- User authentication with JWT
+- Optional guest mode (use the app without registering)
+- 
 
 ## To be added
 
-- User authentication with JWT
-- Optional guest mode (use the app without registering)
-- Timestamps
-- Overdue tasks
-- Introduce a layered architecture for scalability
-- Separate concerns 
-- Extract tasks into its own component
+- Highlight Overdue tasks
+- View and graph user stats
+- Custom Penalties and rewards
+- Journal
+
 
 ---
 
