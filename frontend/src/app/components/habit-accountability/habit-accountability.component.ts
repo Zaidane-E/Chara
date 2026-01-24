@@ -159,6 +159,18 @@ export class HabitAccountabilityComponent implements OnInit {
     this.historyLogs.set(this.guestHabitService.getAccountabilityLog(7));
   }
 
+  cancelPenalty(): void {
+    this.guestHabitService.cancelPenalty();
+    this.todayLog.set(this.guestHabitService.getTodayLog());
+    this.historyLogs.set(this.guestHabitService.getAccountabilityLog(7));
+  }
+
+  cancelReward(): void {
+    this.guestHabitService.cancelReward();
+    this.todayLog.set(this.guestHabitService.getTodayLog());
+    this.historyLogs.set(this.guestHabitService.getAccountabilityLog(7));
+  }
+
   getPenaltyDescription(id: number | undefined): string {
     if (!id) return '-';
     const penalty = this.settings().penalties.find(p => p.id === id);

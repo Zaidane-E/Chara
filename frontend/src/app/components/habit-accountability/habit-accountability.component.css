@@ -328,6 +328,79 @@
   opacity: 0.7;
 }
 
+/* Status with Undo on Hover */
+.status-btn-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.status-applied,
+.status-claimed {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: opacity 0.2s ease;
+}
+
+.status-applied {
+  background: rgba(255, 26, 75, 0.3);
+  border: 2px solid var(--p3r-red);
+  color: var(--p3r-red);
+}
+
+.status-claimed {
+  background: rgba(0, 255, 136, 0.3);
+  border: 2px solid var(--p3r-green);
+  color: var(--p3r-green);
+}
+
+.btn-undo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.btn-undo-penalty {
+  background: var(--p3r-red);
+  border: 2px solid var(--p3r-red);
+  color: var(--p3r-white);
+}
+
+.btn-undo-reward {
+  background: var(--p3r-green);
+  border: 2px solid var(--p3r-green);
+  color: var(--p3r-dark-blue);
+}
+
+.status-btn-wrapper:hover .status-applied,
+.status-btn-wrapper:hover .status-claimed {
+  opacity: 0;
+}
+
+.status-btn-wrapper:hover .btn-undo {
+  opacity: 1;
+}
+
+.btn-undo-penalty:hover {
+  box-shadow: 0 0 15px rgba(255, 26, 75, 0.5);
+}
+
+.btn-undo-reward:hover {
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
 /* Section Row (Penalties & Rewards side by side) */
 .section-row {
   display: grid;

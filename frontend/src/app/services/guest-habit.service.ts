@@ -474,6 +474,32 @@ export class GuestHabitService {
     }
   }
 
+  cancelPenalty(): void {
+    const today = new Date().toISOString().split('T')[0];
+    const json = localStorage.getItem(this.ACCOUNTABILITY_LOG_KEY);
+    const logs: AccountabilityLog[] = json ? JSON.parse(json) : [];
+
+    const log = logs.find(l => l.date === today);
+    if (log) {
+      log.penaltyApplied = false;
+      log.appliedPenaltyId = undefined;
+      this.saveAccountabilityLog(logs);
+    }
+  }
+
+  cancelReward(): void {
+    const today = new Date().toISOString().split('T')[0];
+    const json = localStorage.getItem(this.ACCOUNTABILITY_LOG_KEY);
+    const logs: AccountabilityLog[] = json ? JSON.parse(json) : [];
+
+    const log = logs.find(l => l.date === today);
+    if (log) {
+      log.rewardClaimed = false;
+      log.claimedRewardId = undefined;
+      this.saveAccountabilityLog(logs);
+    }
+  }
+
   getDailyCompletionRate(): { completed: number; total: number; percentage: number } {
     const habits = this.getHabits().filter(h => h.isActive);
     const completed = habits.filter(h => h.isCompletedToday).length;

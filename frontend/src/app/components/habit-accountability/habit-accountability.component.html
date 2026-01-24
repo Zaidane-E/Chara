@@ -71,24 +71,24 @@
         </div>
         <div class="status-actions">
           @if (!goalMet() && settings().penalties.length > 0) {
-            <button
-              class="btn-penalty"
-              [class.applied]="todayLog()?.penaltyApplied"
-              (click)="applyPenalty()"
-              [disabled]="todayLog()?.penaltyApplied"
-            >
-              {{ todayLog()?.penaltyApplied ? 'Penalty Applied' : 'Apply Penalty' }}
-            </button>
+            @if (todayLog()?.penaltyApplied) {
+              <div class="status-btn-wrapper">
+                <span class="status-applied">Penalty Applied</span>
+                <button class="btn-undo btn-undo-penalty" (click)="cancelPenalty()">Undo</button>
+              </div>
+            } @else {
+              <button class="btn-penalty" (click)="applyPenalty()">Apply Penalty</button>
+            }
           }
           @if (goalMet() && settings().rewards.length > 0) {
-            <button
-              class="btn-reward"
-              [class.claimed]="todayLog()?.rewardClaimed"
-              (click)="claimReward()"
-              [disabled]="todayLog()?.rewardClaimed"
-            >
-              {{ todayLog()?.rewardClaimed ? 'Reward Claimed' : 'Claim Reward' }}
-            </button>
+            @if (todayLog()?.rewardClaimed) {
+              <div class="status-btn-wrapper">
+                <span class="status-claimed">Reward Claimed</span>
+                <button class="btn-undo btn-undo-reward" (click)="cancelReward()">Undo</button>
+              </div>
+            } @else {
+              <button class="btn-reward" (click)="claimReward()">Claim Reward</button>
+            }
           }
         </div>
       </div>

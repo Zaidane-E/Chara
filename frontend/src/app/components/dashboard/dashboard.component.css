@@ -633,6 +633,241 @@
   color: var(--p3r-green);
 }
 
+/* Action Panel */
+.action-panel {
+  flex: 1;
+  background: rgba(10, 10, 20, 0.5);
+  border: 1px solid var(--p3r-blue);
+  padding: 0.75rem;
+}
+
+.action-panel.penalty {
+  border-left: 3px solid var(--p3r-red);
+}
+
+.action-panel.reward {
+  border-left: 3px solid var(--p3r-green);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.panel-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.action-panel.penalty .panel-label {
+  color: var(--p3r-red);
+}
+
+.action-panel.reward .panel-label {
+  color: var(--p3r-green);
+}
+
+.btn-random {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: transparent;
+  border: 1px solid var(--p3r-cyan);
+  color: var(--p3r-cyan);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-random:hover {
+  background: rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+}
+
+.action-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(10, 10, 20, 0.4);
+  border: 1px solid var(--p3r-blue);
+  margin-bottom: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.action-item:last-child {
+  margin-bottom: 0;
+}
+
+.action-item.selected {
+  border-color: var(--p3r-cyan);
+  background: rgba(0, 212, 255, 0.1);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.2);
+}
+
+.action-panel.penalty .action-item.selected {
+  border-color: var(--p3r-red);
+  background: rgba(255, 26, 75, 0.15);
+  box-shadow: 0 0 8px rgba(255, 26, 75, 0.2);
+}
+
+.action-panel.reward .action-item.selected {
+  border-color: var(--p3r-green);
+  background: rgba(0, 255, 136, 0.15);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
+}
+
+.action-item.applied,
+.action-item.claimed {
+  opacity: 0.7;
+}
+
+.action-text {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--p3r-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-apply,
+.btn-claim {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-apply {
+  background: var(--p3r-red);
+  color: var(--p3r-white);
+}
+
+.btn-apply:hover {
+  box-shadow: 0 0 10px rgba(255, 26, 75, 0.5);
+}
+
+.btn-claim {
+  background: var(--p3r-green);
+  color: var(--p3r-dark-blue);
+}
+
+.btn-claim:hover {
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.applied-badge,
+.claimed-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.125rem 0.375rem;
+}
+
+.applied-badge {
+  background: rgba(255, 26, 75, 0.2);
+  border: 1px solid var(--p3r-red);
+  color: var(--p3r-red);
+}
+
+.claimed-badge {
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid var(--p3r-green);
+  color: var(--p3r-green);
+}
+
+/* Hover Undo Wrappers */
+.status-hover-wrapper,
+.badge-hover-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.status-hover-wrapper .action-status,
+.badge-hover-wrapper .applied-badge,
+.badge-hover-wrapper .claimed-badge {
+  transition: opacity 0.2s ease;
+}
+
+.btn-undo-small,
+.btn-undo-tiny {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.btn-undo-small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6rem;
+}
+
+.btn-undo-tiny {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.55rem;
+}
+
+.btn-undo-small.penalty,
+.btn-undo-tiny.penalty {
+  background: var(--p3r-red);
+  border: 1px solid var(--p3r-red);
+  color: var(--p3r-white);
+}
+
+.btn-undo-small.reward,
+.btn-undo-tiny.reward {
+  background: var(--p3r-green);
+  border: 1px solid var(--p3r-green);
+  color: var(--p3r-dark-blue);
+}
+
+.status-hover-wrapper:hover .action-status,
+.badge-hover-wrapper:hover .applied-badge,
+.badge-hover-wrapper:hover .claimed-badge {
+  opacity: 0;
+}
+
+.status-hover-wrapper:hover .btn-undo-small,
+.badge-hover-wrapper:hover .btn-undo-tiny {
+  opacity: 1;
+}
+
+.btn-undo-small.penalty:hover,
+.btn-undo-tiny.penalty:hover {
+  box-shadow: 0 0 8px rgba(255, 26, 75, 0.5);
+}
+
+.btn-undo-small.reward:hover,
+.btn-undo-tiny.reward:hover {
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+}
+
 .empty-actions {
   flex: 1;
   display: flex;

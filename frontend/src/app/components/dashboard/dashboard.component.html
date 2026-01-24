@@ -133,27 +133,80 @@
       </div>
 
       <div class="accountability-actions">
+        <!-- Penalties (when goal not met) -->
         @if (!goalMet() && accountabilitySettings().penalties.length > 0) {
-          <div class="action-card penalty">
-            <span class="action-label">Penalty</span>
-            <span class="action-count">{{ accountabilitySettings().penalties.length }} defined</span>
-            @if (todayLog()?.penaltyApplied) {
-              <span class="action-status applied">Applied</span>
-            }
+          <div class="action-panel penalty">
+            <div class="panel-header">
+              <span class="panel-label">Penalties</span>
+              @if (todayLog()?.penaltyApplied) {
+                <div class="status-hover-wrapper">
+                  <span class="action-status applied">Applied</span>
+                  <button class="btn-undo-small penalty" (click)="cancelPenalty()">Undo</button>
+                </div>
+              } @else if (accountabilitySettings().penalties.length > 1) {
+                <button class="btn-random" (click)="pickRandomPenalty()">Random</button>
+              }
+            </div>
+            <ul class="action-list">
+              @for (penalty of accountabilitySettings().penalties; track penalty.id) {
+                <li class="action-item"
+                    [class.selected]="selectedPenalty()?.id === penalty.id"
+                    [class.applied]="todayLog()?.penaltyApplied && todayLog()?.appliedPenaltyId === penalty.id">
+                  <span class="action-text">{{ penalty.description }}</span>
+                  @if (!todayLog()?.penaltyApplied) {
+                    <button class="btn-apply" (click)="applyPenalty(penalty.id)">Apply</button>
+                  } @else if (todayLog()?.appliedPenaltyId === penalty.id) {
+                    <div class="badge-hover-wrapper">
+                      <span class="applied-badge">Applied</span>
+                      <button class="btn-undo-tiny penalty" (click)="cancelPenalty()">Undo</button>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
           </div>
         }
+
+        <!-- Rewards (when goal met) -->
         @if (goalMet() && accountabilitySettings().rewards.length > 0) {
-          <div class="action-card reward">
-            <span class="action-label">Reward</span>
-            <span class="action-count">{{ accountabilitySettings().rewards.length }} available</span>
-            @if (todayLog()?.rewardClaimed) {
-              <span class="action-status claimed">Claimed</span>
-            }
+          <div class="action-panel reward">
+            <div class="panel-header">
+              <span class="panel-label">Rewards</span>
+              @if (todayLog()?.rewardClaimed) {
+                <div class="status-hover-wrapper">
+                  <span class="action-status claimed">Claimed</span>
+                  <button class="btn-undo-small reward" (click)="cancelReward()">Undo</button>
+                </div>
+              } @else if (accountabilitySettings().rewards.length > 1) {
+                <button class="btn-random" (click)="pickRandomReward()">Random</button>
+              }
+            </div>
+            <ul class="action-list">
+              @for (reward of accountabilitySettings().rewards; track reward.id) {
+                <li class="action-item"
+                    [class.selected]="selectedReward()?.id === reward.id"
+                    [class.claimed]="todayLog()?.rewardClaimed && todayLog()?.claimedRewardId === reward.id">
+                  <span class="action-text">{{ reward.description }}</span>
+                  @if (!todayLog()?.rewardClaimed) {
+                    <button class="btn-claim" (click)="claimReward(reward.id)">Claim</button>
+                  } @else if (todayLog()?.claimedRewardId === reward.id) {
+                    <div class="badge-hover-wrapper">
+                      <span class="claimed-badge">Claimed</span>
+                      <button class="btn-undo-tiny reward" (click)="cancelReward()">Undo</button>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
           </div>
         }
-        @if (accountabilitySettings().penalties.length === 0 && accountabilitySettings().rewards.length === 0) {
+
+        <!-- No penalties/rewards configured -->
+        @if ((!goalMet() && accountabilitySettings().penalties.length === 0) ||
+             (goalMet() && accountabilitySettings().rewards.length === 0)) {
           <div class="empty-actions">
-            <span>No penalties or rewards set up yet.</span>
+            <span>No {{ goalMet() ? 'rewards' : 'penalties' }} set up yet.</span>
+            <a routerLink="/habits/accountability">Configure</a>
           </div>
         }
       </div>

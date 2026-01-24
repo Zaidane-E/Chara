@@ -5,7 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { GuestTaskService } from '../../services/guest-task.service';
 import { GuestHabitService } from '../../services/guest-habit.service';
 import { Task } from '../../models/task.model';
-import { Habit, AccountabilitySettings, AccountabilityLog } from '../../models/habit.model';
+import { Habit, AccountabilitySettings, AccountabilityLog, Penalty, Reward } from '../../models/habit.model';
 
 interface WeekDay {
   date: Date;
@@ -42,6 +42,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   todaysHabits = signal<Habit[]>([]);
   accountabilitySettings = signal<AccountabilitySettings>({ goalPercentage: 80, penalties: [], rewards: [] });
   todayLog = signal<AccountabilityLog | null>(null);
+
+  // Random selection
+  selectedPenalty = signal<Penalty | null>(null);
+  selectedReward = signal<Reward | null>(null);
 
   isGuest = this.authService.isGuest;
 
@@ -223,5 +227,42 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  // Accountability methods
+  pickRandomPenalty(): void {
+    const penalties = this.accountabilitySettings().penalties;
+    if (penalties.length < 2) return;
+    const randomIndex = Math.floor(Math.random() * penalties.length);
+    this.selectedPenalty.set(penalties[randomIndex]);
+  }
+
+  pickRandomReward(): void {
+    const rewards = this.accountabilitySettings().rewards;
+    if (rewards.length < 2) return;
+    const randomIndex = Math.floor(Math.random() * rewards.length);
+    this.selectedReward.set(rewards[randomIndex]);
+  }
+
+  applyPenalty(penaltyId: number): void {
+    this.guestHabitService.applyPenalty(penaltyId);
+    this.todayLog.set(this.guestHabitService.getTodayLog());
+    this.selectedPenalty.set(null);
+  }
+
+  claimReward(rewardId: number): void {
+    this.guestHabitService.claimReward(rewardId);
+    this.todayLog.set(this.guestHabitService.getTodayLog());
+    this.selectedReward.set(null);
+  }
+
+  cancelPenalty(): void {
+    this.guestHabitService.cancelPenalty();
+    this.todayLog.set(this.guestHabitService.getTodayLog());
+  }
+
+  cancelReward(): void {
+    this.guestHabitService.cancelReward();
+    this.todayLog.set(this.guestHabitService.getTodayLog());
   }
 }
