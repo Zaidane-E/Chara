@@ -43,10 +43,38 @@ export interface DailyCompletion {
   completed: boolean;
 }
 
-export interface HabitFilter {
-  isActive?: boolean;
-}
+export type HabitSortOption = 'default' | 'completionRate' | 'streak' | 'completionStatus';
 
 export interface ReorderHabits {
   habitIds: number[];
+}
+
+// Accountability types
+export interface Penalty {
+  id: number;
+  description: string;
+  createdAt: string;
+}
+
+export interface Reward {
+  id: number;
+  description: string;
+  createdAt: string;
+}
+
+export interface AccountabilitySettings {
+  goalPercentage: number;
+  penalties: Penalty[];
+  rewards: Reward[];
+}
+
+export interface AccountabilityLog {
+  id: number;
+  date: string;
+  completionRate: number;
+  goalMet: boolean;
+  penaltyApplied: boolean;
+  rewardClaimed: boolean;
+  appliedPenaltyId?: number;
+  claimedRewardId?: number;
 }

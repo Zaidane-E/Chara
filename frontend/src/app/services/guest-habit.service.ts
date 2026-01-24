@@ -3,10 +3,13 @@ import {
   Habit,
   CreateHabit,
   UpdateHabit,
-  HabitFilter,
   HabitCompletion,
   HabitStats,
-  DailyCompletion
+  DailyCompletion,
+  AccountabilitySettings,
+  AccountabilityLog,
+  Penalty,
+  Reward
 } from '../models/habit.model';
 
 interface StoredHabit {
@@ -31,8 +34,13 @@ interface StoredCompletion {
 export class GuestHabitService {
   private readonly HABITS_KEY = 'guest_habits';
   private readonly COMPLETIONS_KEY = 'guest_habit_completions';
+  private readonly ACCOUNTABILITY_SETTINGS_KEY = 'guest_accountability_settings';
+  private readonly ACCOUNTABILITY_LOG_KEY = 'guest_accountability_log';
   private nextHabitId = 1;
   private nextCompletionId = 1;
+  private nextPenaltyId = 1;
+  private nextRewardId = 1;
+  private nextLogId = 1;
 
   constructor() {
     this.initializeIds();
@@ -128,12 +136,31 @@ export class GuestHabitService {
     return streak;
   }
 
-  getHabits(filter?: HabitFilter): Habit[] {
-    let habits = this.loadHabits();
-    if (filter?.isActive !== undefined) {
-      habits = habits.filter(h => h.isActive === filter.isActive);
+  private calculateLongestStreak(completions: StoredCompletion[]): number {
+    if (completions.length === 0) return 0;
+
+    const dates = [...new Set(completions.map(c => c.completedDate))].sort();
+    let longestStreak = 1;
+    let currentStreak = 1;
+
+    for (let i = 1; i < dates.length; i++) {
+      const prevDate = new Date(dates[i - 1]);
+      const currDate = new Date(dates[i]);
+      const diffDays = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        currentStreak++;
+        longestStreak = Math.max(longestStreak, currentStreak);
+      } else {
+        currentStreak = 1;
+      }
     }
-    return habits
+
+    return longestStreak;
+  }
+
+  getHabits(): Habit[] {
+    return this.loadHabits()
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map(h => this.mapToHabit(h));
   }
@@ -287,7 +314,7 @@ export class GuestHabitService {
       habitTitle: habit.title,
       totalCompletions: completions.length,
       currentStreak: this.calculateStreak(completions),
-      longestStreak: 0,
+      longestStreak: this.calculateLongestStreak(completions),
       completionRateLastMonth: days > 0 ? (completionDates.size / days) * 100 : 0,
       completionHistory: history
     };
@@ -302,5 +329,156 @@ export class GuestHabitService {
 
   hasGuestHabits(): boolean {
     return this.loadHabits().length > 0;
+  }
+
+  // Accountability methods
+  getAccountabilitySettings(): AccountabilitySettings {
+    const json = localStorage.getItem(this.ACCOUNTABILITY_SETTINGS_KEY);
+    if (json) {
+      const settings = JSON.parse(json);
+      // Initialize IDs from existing data
+      if (settings.penalties?.length > 0) {
+        this.nextPenaltyId = Math.max(...settings.penalties.map((p: Penalty) => p.id)) + 1;
+      }
+      if (settings.rewards?.length > 0) {
+        this.nextRewardId = Math.max(...settings.rewards.map((r: Reward) => r.id)) + 1;
+      }
+      return settings;
+    }
+    return { goalPercentage: 80, penalties: [], rewards: [] };
+  }
+
+  saveAccountabilitySettings(settings: AccountabilitySettings): void {
+    localStorage.setItem(this.ACCOUNTABILITY_SETTINGS_KEY, JSON.stringify(settings));
+  }
+
+  addPenalty(description: string): Penalty {
+    const settings = this.getAccountabilitySettings();
+    const penalty: Penalty = {
+      id: this.nextPenaltyId++,
+      description,
+      createdAt: new Date().toISOString()
+    };
+    settings.penalties.push(penalty);
+    this.saveAccountabilitySettings(settings);
+    return penalty;
+  }
+
+  removePenalty(id: number): void {
+    const settings = this.getAccountabilitySettings();
+    settings.penalties = settings.penalties.filter(p => p.id !== id);
+    this.saveAccountabilitySettings(settings);
+  }
+
+  addReward(description: string): Reward {
+    const settings = this.getAccountabilitySettings();
+    const reward: Reward = {
+      id: this.nextRewardId++,
+      description,
+      createdAt: new Date().toISOString()
+    };
+    settings.rewards.push(reward);
+    this.saveAccountabilitySettings(settings);
+    return reward;
+  }
+
+  removeReward(id: number): void {
+    const settings = this.getAccountabilitySettings();
+    settings.rewards = settings.rewards.filter(r => r.id !== id);
+    this.saveAccountabilitySettings(settings);
+  }
+
+  setGoalPercentage(percentage: number): void {
+    const settings = this.getAccountabilitySettings();
+    settings.goalPercentage = Math.max(0, Math.min(100, percentage));
+    this.saveAccountabilitySettings(settings);
+  }
+
+  getAccountabilityLog(days: number = 7): AccountabilityLog[] {
+    const json = localStorage.getItem(this.ACCOUNTABILITY_LOG_KEY);
+    const logs: AccountabilityLog[] = json ? JSON.parse(json) : [];
+
+    if (logs.length > 0) {
+      this.nextLogId = Math.max(...logs.map(l => l.id)) + 1;
+    }
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    const startDateStr = startDate.toISOString().split('T')[0];
+
+    return logs
+      .filter(l => l.date >= startDateStr)
+      .sort((a, b) => b.date.localeCompare(a.date));
+  }
+
+  private saveAccountabilityLog(logs: AccountabilityLog[]): void {
+    localStorage.setItem(this.ACCOUNTABILITY_LOG_KEY, JSON.stringify(logs));
+  }
+
+  getTodayLog(): AccountabilityLog | null {
+    const today = new Date().toISOString().split('T')[0];
+    const logs = this.getAccountabilityLog(1);
+    return logs.find(l => l.date === today) || null;
+  }
+
+  logAccountability(completionRate: number, goalMet: boolean): AccountabilityLog {
+    const today = new Date().toISOString().split('T')[0];
+    const json = localStorage.getItem(this.ACCOUNTABILITY_LOG_KEY);
+    const logs: AccountabilityLog[] = json ? JSON.parse(json) : [];
+
+    const existingIndex = logs.findIndex(l => l.date === today);
+
+    if (existingIndex !== -1) {
+      logs[existingIndex].completionRate = completionRate;
+      logs[existingIndex].goalMet = goalMet;
+      this.saveAccountabilityLog(logs);
+      return logs[existingIndex];
+    }
+
+    const log: AccountabilityLog = {
+      id: this.nextLogId++,
+      date: today,
+      completionRate,
+      goalMet,
+      penaltyApplied: false,
+      rewardClaimed: false
+    };
+    logs.push(log);
+    this.saveAccountabilityLog(logs);
+    return log;
+  }
+
+  applyPenalty(penaltyId: number): void {
+    const today = new Date().toISOString().split('T')[0];
+    const json = localStorage.getItem(this.ACCOUNTABILITY_LOG_KEY);
+    const logs: AccountabilityLog[] = json ? JSON.parse(json) : [];
+
+    const log = logs.find(l => l.date === today);
+    if (log) {
+      log.penaltyApplied = true;
+      log.appliedPenaltyId = penaltyId;
+      this.saveAccountabilityLog(logs);
+    }
+  }
+
+  claimReward(rewardId: number): void {
+    const today = new Date().toISOString().split('T')[0];
+    const json = localStorage.getItem(this.ACCOUNTABILITY_LOG_KEY);
+    const logs: AccountabilityLog[] = json ? JSON.parse(json) : [];
+
+    const log = logs.find(l => l.date === today);
+    if (log) {
+      log.rewardClaimed = true;
+      log.claimedRewardId = rewardId;
+      this.saveAccountabilityLog(logs);
+    }
+  }
+
+  getDailyCompletionRate(): { completed: number; total: number; percentage: number } {
+    const habits = this.getHabits().filter(h => h.isActive);
+    const completed = habits.filter(h => h.isCompletedToday).length;
+    const total = habits.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { completed, total, percentage };
   }
 }

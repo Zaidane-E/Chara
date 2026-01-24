@@ -24,6 +24,16 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'habits/overview',
+    loadComponent: () => import('./components/habit-overview/habit-overview.component').then(m => m.HabitOverviewComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'habits/accountability',
+    loadComponent: () => import('./components/habit-accountability/habit-accountability.component').then(m => m.HabitAccountabilityComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'habits',
     loadComponent: () => import('./components/habit-list/habit-list.component').then(m => m.HabitListComponent),
     canActivate: [authGuard]

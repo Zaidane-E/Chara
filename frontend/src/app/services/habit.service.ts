@@ -5,7 +5,6 @@ import {
   Habit,
   CreateHabit,
   UpdateHabit,
-  HabitFilter,
   HabitCompletion,
   HabitStats,
   ReorderHabits
@@ -18,12 +17,8 @@ export class HabitService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5016/api/habits';
 
-  getHabits(filter?: HabitFilter): Observable<Habit[]> {
-    let params = new HttpParams();
-    if (filter?.isActive !== undefined) {
-      params = params.set('isActive', filter.isActive.toString());
-    }
-    return this.http.get<Habit[]>(this.apiUrl, { params });
+  getHabits(): Observable<Habit[]> {
+    return this.http.get<Habit[]>(this.apiUrl);
   }
 
   getHabit(id: number): Observable<Habit> {
