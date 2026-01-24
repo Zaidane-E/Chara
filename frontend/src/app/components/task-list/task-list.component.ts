@@ -66,7 +66,7 @@ export class TaskListComponent implements OnInit {
 
     if (this.authService.isGuest()) {
       const tasks = this.guestTaskService.getTasks(filter);
-      this.tasks.set(tasks);
+      this.tasks.set(this.addOverdueFlag(tasks));
       this.loading.set(false);
     } else {
       this.taskService.getTasks(filter).subscribe({
@@ -104,7 +104,7 @@ export class TaskListComponent implements OnInit {
 
     if (this.authService.isGuest()) {
       const task = this.guestTaskService.createTask(createDto);
-      this.tasks.update(tasks => [task, ...tasks]);
+      this.tasks.update(tasks => [this.addOverdueFlag([task])[0], ...tasks]);
       this.resetNewTaskForm();
     } else {
       this.taskService.createTask(createDto).subscribe({
@@ -130,7 +130,7 @@ export class TaskListComponent implements OnInit {
     if (this.authService.isGuest()) {
       const updated = this.guestTaskService.toggleComplete(task.id);
       if (updated) {
-        this.tasks.update(tasks => tasks.map(t => t.id === updated.id ? updated : t));
+        this.tasks.update(tasks => tasks.map(t => t.id === updated.id ? this.addOverdueFlag([updated])[0] : t));
       }
     } else {
       this.taskService.toggleComplete(task.id).subscribe({
@@ -171,7 +171,7 @@ export class TaskListComponent implements OnInit {
     if (this.authService.isGuest()) {
       const updated = this.guestTaskService.updateTask(task.id, updateDto);
       if (updated) {
-        this.tasks.update(tasks => tasks.map(t => t.id === updated.id ? updated : t));
+        this.tasks.update(tasks => tasks.map(t => t.id === updated.id ? this.addOverdueFlag([updated])[0] : t));
       }
       this.cancelEdit();
     } else {
