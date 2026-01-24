@@ -26,11 +26,15 @@ Currently supports user tasks, task priorities, due dates, and completion tracki
 
 ## To be added
 
-- Highlight Overdue tasks
-- View and graph user stats
-- Custom Penalties and rewards
+- Graph user stats
+- More customization options for penalties and rewards
+- Add streak of successful/failed days in a row
 - Journal
 
+## Known Issues
+- Dashboard
+	- Shows percentage for the wrong day in weekly view
+	- Shows tasks as a fraction instead of just showing the number of tasks completed in that day
 
 ---
 
@@ -79,7 +83,7 @@ Swagger UI available at https://localhost:<port>/swagger
 1. Navigate to frontend folder:
 
 ```bash
-cd frontend/task-ui
+cd frontend
 ```
 
 2. Install dependencies:
