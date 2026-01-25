@@ -42,6 +42,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 
 // Database configuration - PostgreSQL (Neon)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
