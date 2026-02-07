@@ -1,4 +1,4 @@
-# Task API
+# Chara - Task & Habit data tracker
 
 Web app built with **C# (.NET 8)** backend and **Angular** frontend.  
 Currently supports user tasks, task priorities, due dates, and completion tracking. Includes EF Core migrations, Swagger API, and unit tests.
